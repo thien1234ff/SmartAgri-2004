@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - Smart Agriculture</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="stylesheet" href="login.css">
+  <link rel="stylesheet" href="Register.css">
+</head>
+<body>
+  <div class="register-wrapper">
+    <div class="left-panel">
+      <img src="register.jpg" alt="Background Image" class="background-image">
+      <div class="content-overlay">
+        <a href="#" class="back-button">Back to website</a>
+        <div class="divider"></div>
+      </div>
+    </div>
+    <div class="right-panel">
+      <h2 style="margin-top:20px;color:black">ĐĂNG KÝ</h2>
+      <p class="login-link">Already have an account? <a href="login.html">Log in</a></p>
+      <form id="registerForm">
+        <input type="text" id="lastName" placeholder=" Your Name" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Enter your password" required>
+        <input type="password" id="re_password" placeholder="Enter your password again" required>
+        <input type="text" id="sdt" placeholder="Enter your phone" required>
+        <button type="submit" class="create-button">Đăng ký</button>
+      </form>
+      <p id="error" class="error"></p>
+    </div>
+  </div>
+
+ <!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+  // 🔁 Thay bằng cấu hình thật từ Firebase Console
+    const firebaseConfig = {
+    apiKey: "AIzaSyA6WyGsOeOlct2BcOeQSZ6ogo2aGUa_MyQ",
+    authDomain: "nongnghiepxanh-f6689.firebaseapp.com",
+    projectId: "nongnghiepxanh-f6689",
+    storageBucket: "nongnghiepxanh-f6689.firebasestorage.app",
+    messagingSenderId: "846834085038",
+    appId: "1:846834085038:web:cfac519e025896626d113f",
+    measurementId: "G-619BFYRKGT"
+  };
+
+  // Khởi tạo Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // Bắt sự kiện Đăng ký
+  document.getElementById("registerForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const lastName = document.getElementById("lastName").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const re_password = document.getElementById("re_password").value.trim();
+    const phone = document.getElementById("sdt").value.trim();
+    const errorP = document.getElementById("error");
+
+    if(password !== re_password){
+      errorP.textContent = "❌Mật khẩu không trùng";
+      errorP.style.color = "red";
+      return;
+    }
+
+    if (!email || !password || !re_password || !lastName || !phone) {
+      errorP.textContent = "❌ Vui lòng điền đầy đủ thông tin.";
+      errorP.style.color = "red";
+      return;
+    }
+    if (password.length < 6) {
+    errorP.textContent = "❌ Mật khẩu phải ít nhất 6 ký tự.";
+    errorP.style.color = "red";
+    return;
+    } 
+    
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        errorP.style.color = "green";
+        errorP.textContent = "🎉 Đăng ký thành công!";
+        console.log("User registered:", user);
+        setTimeout(() => {
+        window.location.href = "login.html";
+        }, 1500);
+        // 👉 Nếu muốn lưu thêm vào Firestore, bạn có thể thêm tại đây
+        // window.location.href = "login.html"; // chuyển về trang đăng nhập nếu muốn
+      })
+      .catch((error) => {
+        console.error("Registration error:", error);
+        errorP.textContent = "❌ " + error.message;
+        errorP.style.color = "red";
+      });
+  });
+</script>
