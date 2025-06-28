@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trang Chủ - Smart Agriculture</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <header>
+    <div class="logo">SMART AGRICULTURE</div>
+    <nav>
+      <ul>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#" id="profileLink">Profile</a></li>
+        <li><a href="#" id="logoutLink">Logout</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="system-features">
+      <h2>Chức năng hệ thống</h2>
+      <div class="features-grid">
+        <div class="feature-card">1. Login / Logout</div>
+        <div class="feature-card"><a href="Register.html">2. Register</a></div>
+        <div class="feature-card">3. Profile Mgmt</div>
+        <div class="feature-card">4. Role & Permission</div>
+        <div class="feature-card">5. Product CRUD</div>
+        <div class="feature-card">6. Show Product</div>
+        <div class="feature-card">7. Shopping Cart</div>
+        <div class="feature-card">8. Farm Mgmt</div>
+        <div class="feature-card">9. Crop Prediction</div>
+        <div class="feature-card">10. Weather Forecast</div>
+        <div class="feature-card">11. IoT Sensor Integration</div>
+        <div class="feature-card">12. Market Analysis</div>
+        <div class="feature-card">13. Map Integration</div>
+        <div class="feature-card">14. Community Forum</div>
+        <div class="feature-card">15. Knowledge Base</div>
+        <div class="feature-card">16. Feedback / Comment</div>
+        <div class="feature-card">17. Search Item</div>
+        <div class="feature-card">18. Index Page</div>
+        <div class="feature-card">19. Report Page</div>
+        <div class="feature-card">20. Chatbot Support</div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 Smart Agriculture. All rights reserved.</p>
+  </footer>
+
+ <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    // 🔁 Thay thế bằng cấu hình thật của bạn từ Firebase Console
+    const firebaseConfig = {
+    apiKey: "AIzaSyA6WyGsOeOlct2BcOeQSZ6ogo2aGUa_MyQ",
+    authDomain: "nongnghiepxanh-f6689.firebaseapp.com",
+    projectId: "nongnghiepxanh-f6689",
+    storageBucket: "nongnghiepxanh-f6689.firebasestorage.app",
+    messagingSenderId: "846834085038",
+    appId: "1:846834085038:web:cfac519e025896626d113f",
+    measurementId: "G-619BFYRKGT"
+  };
+
+    // Khởi tạo Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Kiểm tra trạng thái đăng nhập
+    auth.onAuthStateChanged((user) => {
+      const logoutLink = document.getElementById('logoutLink');
+      const profileLink = document.getElementById('profileLink');
+      if (user) {
+        logoutLink.style.display = 'block';
+        profileLink.href = '#';
+        profileLink.onclick = () => alert('Profile Management (pending)');
+      } else {
+        logoutLink.style.display = 'none';
+        profileLink.href = 'login.html';
+        profileLink.textContent = 'Login';
+      }
+    });
+
+    // Xử lý đăng xuất
+    document.getElementById('logoutLink').addEventListener('click', () => {
+      auth.signOut().then(() => {
+        location.reload();
+      });
+    });
+  </script>
+</body>
+</html>

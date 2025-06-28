@@ -30,7 +30,7 @@
         </div>
         <button type="submit" class="login-btn">ĐĂNG NHẬP</button>
         <div class="links">
-          <a href="#" class="forgot-password">Quên mật khẩu?</a>
+          <a href="password.html" class="forgot-password">Quên mật khẩu?</a>
           <a href="Register.html" class="logout">Đăng ký</a>
         </div>
         <div class="error-message" id="error-message"></div>
@@ -76,7 +76,7 @@
           errorMsg.style.color = 'green';
           errorMsg.textContent = '🎉 Đăng nhập thành công!';
           console.log('User:', userCredential.user);
-          // window.location.href = "trangchu.html"; // Chuyển trang nếu cần
+          window.location.href = "index.html"; // Chuyển trang nếu cần
         })
         .catch((error) => {
           console.error(error);
