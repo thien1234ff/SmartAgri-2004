@@ -3,99 +3,135 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Register - Smart Agriculture</title>
+  <title>Đăng Ký - Smart Agriculture</title>
   <link rel="icon" type="image/png" href="logo.png">
-  <link rel="stylesheet" href="login.css">
-  <link rel="stylesheet" href="Register.css">
+  <link rel="stylesheet" href="register.css">
 </head>
 <body>
-  <div class="register-wrapper">
-    <div class="left-panel">
-      <img src="register.jpg" alt="Background Image" class="background-image">
-      <div class="content-overlay">
-        <a href="index.html" class="back-button">Back to website</a>
-        <div class="divider"></div>
-      </div>
-    </div>
-    <div class="right-panel">
-      <h2 style="margin-top:20px;color:black">ĐĂNG KÝ</h2>
-      <p class="login-link">Already have an account? <a href="login.html">Log in</a></p>
+  <header>
+    <div class="logo">SMART AGRICULTURE</div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="#">Register</a></li>
+        <li><a href="#" id="logoutLink">Logout</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="register-container">
+      <h2>Đăng Ký</h2>
+      <p class="login-link">Đã có tài khoản? <a href="login.html">Đăng nhập</a></p>
       <form id="registerForm">
-        <input type="text" id="lastName" placeholder=" Your Name" required>
+        <input type="text" id="username" placeholder="Tên hiển thị" required>
+        <input type="text" id="firstName" placeholder="Tên" required>
+        <input type="text" id="lastName" placeholder="Họ" required>
         <input type="email" id="email" placeholder="Email" required>
-        <input type="password" id="password" placeholder="Enter your password" required>
-        <input type="password" id="re_password" placeholder="Enter your password again" required>
-        <input type="text" id="sdt" placeholder="Enter your phone" required>
-        <button type="submit" class="create-button">Đăng ký</button>
+        <input type="password" id="password" placeholder="Mật khẩu" required>
+        <label style="display: flex; align-items:self-start; gap: 4px;">
+          <input type="checkbox" id="terms" required style="margin-left:-180px"><span style="margin-left:-200px;margin-top:8px;">Tôi đồng ý với Điều khoản & Điều kiện</span>
+        </label>
+        <button type="submit" class="create-button">Tạo tài khoản</button>
       </form>
       <p id="error" class="error"></p>
-    </div>
-  </div>
+    </section>
+  </main>
 
- <!-- Firebase SDK -->
-<script type="module">
+  <footer>
+    <p>© 2025 Smart Agriculture. All rights reserved.</p>
+  </footer>
+
+ <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    sendEmailVerification,
+    updateProfile
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import {
+    getFirestore,
+    doc,
+    setDoc
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  // 🔁 Thay bằng cấu hình thật từ Firebase Console
-    const firebaseConfig = {
+  const firebaseConfig = {
     apiKey: "AIzaSyA6WyGsOeOlct2BcOeQSZ6ogo2aGUa_MyQ",
     authDomain: "nongnghiepxanh-f6689.firebaseapp.com",
     projectId: "nongnghiepxanh-f6689",
     storageBucket: "nongnghiepxanh-f6689.firebasestorage.app",
     messagingSenderId: "846834085038",
     appId: "1:846834085038:web:cfac519e025896626d113f",
-    measurementId: "G-619BFYRKGT"
+    measurementId: "G-619BFYRKGT",
+    databaseURL: "https://nongnghiepxanh-f6689-default-rtdb.asia-southeast1.firebasedatabase.app"
   };
 
-  // Khởi tạo Firebase
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+  const db = getFirestore(app);
 
-  // Bắt sự kiện Đăng ký
-  document.getElementById("registerForm").addEventListener("submit", function (e) {
+  document.getElementById('registerForm').addEventListener('submit', (e) => {
     e.preventDefault();
 
-    const lastName = document.getElementById("lastName").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const re_password = document.getElementById("re_password").value.trim();
-    const phone = document.getElementById("sdt").value.trim();
-    const errorP = document.getElementById("error");
+    const username = document.getElementById('username').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const firstName = document.getElementById('firstName').value;
+    const lastName = document.getElementById('lastName').value;
 
-    if(password !== re_password){
-      errorP.textContent = "❌Mật khẩu không trùng";
-      errorP.style.color = "red";
-      return;
-    }
+    if (document.getElementById('terms').checked) {
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
 
-    if (!email || !password || !re_password || !lastName || !phone) {
-      errorP.textContent = "❌ Vui lòng điền đầy đủ thông tin.";
-      errorP.style.color = "red";
-      return;
+          return updateProfile(user, {
+            displayName: username
+          }).then(() => {
+            // ✅ Lưu user vào Firestore
+            return setDoc(doc(db, "users", user.uid), {
+              email: email,
+              displayName: username,
+              firstName: firstName,
+              lastName: lastName,
+              role: "user" // mặc định là user
+            });
+          }).then(() => {
+            return sendEmailVerification(user);
+          });
+        })
+        .then(() => {
+          const error = document.getElementById('error');
+          error.textContent = 'Đăng ký thành công! Vui lòng kiểm tra email để xác nhận.';
+          error.style.color = '#2e7d32'; // xanh lá
+          document.getElementById('registerForm').reset();
+          window.location.href = "login.html";
+        })
+        .catch((error) => {
+          const errorMessage = document.getElementById('error');
+          errorMessage.textContent = 'Đăng ký thất bại: ' + error.message;
+          errorMessage.style.color = '#d32f2f';
+        });
+    } else {
+      document.getElementById('error').textContent = 'Vui lòng đồng ý với điều khoản.';
     }
-    if (password.length < 6) {
-    errorP.textContent = "❌ Mật khẩu phải ít nhất 6 ký tự.";
-    errorP.style.color = "red";
-    return;
-    } 
-    
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        errorP.style.color = "green";
-        errorP.textContent = "🎉 Đăng ký thành công!";
-        console.log("User registered:", user);
-        setTimeout(() => {
-        window.location.href = "login.html";
-        }, 1500);
-        // 👉 Nếu muốn lưu thêm vào Firestore, bạn có thể thêm tại đây
-        // window.location.href = "login.html"; // chuyển về trang đăng nhập nếu muốn
-      })
-      .catch((error) => {
-        console.error("Registration error:", error);
-        errorP.textContent = "❌ " + error.message;
-        errorP.style.color = "red";
-      });
+  });
+
+  // Kiểm tra trạng thái đăng nhập
+  auth.onAuthStateChanged((user) => {
+    const logoutLink = document.getElementById('logoutLink');
+    if (user) {
+      logoutLink.style.display = 'block';
+      logoutLink.href = '#';
+      logoutLink.onclick = () => {
+        auth.signOut().then(() => {
+          window.location.href = 'index.html';
+        });
+      };
+    } else {
+      logoutLink.style.display = 'none';
+    }
   });
 </script>
+</body>
+</html>

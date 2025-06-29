@@ -1,0 +1,72 @@
+[
+  {
+    "name": "Rau Muống Sạch",
+    "price": 12000,
+    "description": "Rau muống sạch trồng thủy canh, giàu dinh dưỡng, không hóa chất.",
+    "imageUrl": "https://cdn.pixabay.com/photo/2020/02/09/12/50/morning-glory-4832238_1280.jpg",
+    "category": "Rau Xanh"
+  },
+  {
+    "name": "Cà Chua Hữu Cơ",
+    "price": 25000,
+    "description": "Cà chua đỏ mọng, được trồng theo tiêu chuẩn hữu cơ, giàu vitamin C.",
+    "imageUrl": "https://cdn.pixabay.com/photo/2018/04/07/17/02/tomatoes-3303883_1280.jpg",
+    "category": "Rau Củ Quả"
+  },
+  {
+    "name": "Cải Bó Xôi Baby",
+    "price": 28000,
+    "description": "Cải bó xôi baby non, lá mềm, dùng chế biến món salad và xào.",
+    "imageUrl": "https://cdn.pixabay.com/photo/2021/07/27/10/16/spinach-6496329_1280.jpg",
+    "category": "Rau Xanh"
+  },
+  {
+    "name": "Khoai Tây Đà Lạt",
+    "price": 18000,
+    "description": "Khoai tây vàng Đà Lạt, bột mịn, ngọt nhẹ, phù hợp làm khoai chiên.",
+    "imageUrl": "https://cdn.pixabay.com/photo/2015/12/08/00/32/potatoes-1081130_1280.jpg",
+    "category": "Củ Quả"
+  },
+  {
+    "name": "Ớt Chuông Đỏ",
+    "price": 30000,
+    "description": "Ớt chuông đỏ Đà Lạt, giòn ngọt, màu sắc đẹp, giàu vitamin A, C.",
+    "imageUrl": "https://cdn.pixabay.com/photo/2016/11/29/10/02/peppers-1867560_1280.jpg",
+    "category": "Rau Củ Quả"
+  },
+  {
+    "name": "Dưa Leo Sạch",
+    "price": 15000,
+    "description": "Dưa leo tươi giòn, ít hạt, dùng ăn sống hoặc chế biến món ăn.",
+    "imageUrl": "https://cdn.pixabay.com/photo/2019/07/31/08/59/cucumber-4372878_1280.jpg",
+    "category": "Rau Xanh"
+  },
+  {
+    "name": "Bí Đỏ Hồ Lô",
+    "price": 22000,
+    "description": "Bí đỏ hồ lô ngọt bùi, giàu beta-caroten, tốt cho sức khỏe.",
+    "imageUrl": "https://cdn.pixabay.com/photo/2018/10/17/21/23/pumpkin-3757006_1280.jpg",
+    "category": "Củ Quả"
+  },
+  {
+    "name": "Hành Tây Trắng",
+    "price": 17000,
+    "description": "Hành tây trắng Đà Lạt, vị ngọt nhẹ, ít cay, dùng nấu canh, salad.",
+    "imageUrl": "https://cdn.pixabay.com/photo/2020/03/12/16/35/onion-4923779_1280.jpg",
+    "category": "Củ Quả"
+  },
+  {
+    "name": "Bông Cải Xanh",
+    "price": 35000,
+    "description": "Bông cải xanh Đà Lạt, giòn, vị ngọt, giàu chất xơ, vitamin C.",
+    "imageUrl": "https://cdn.pixabay.com/photo/2020/01/28/14/08/broccoli-4798099_1280.jpg",
+    "category": "Rau Xanh"
+  },
+  {
+    "name": "Cà Rốt Hữu Cơ",
+    "price": 16000,
+    "description": "Cà rốt tươi Đà Lạt, màu sắc đẹp, giòn ngọt, nhiều beta-caroten.",
+    "imageUrl": "https://cdn.pixabay.com/photo/2018/06/14/22/28/carrots-3474639_1280.jpg",
+    "category": "Củ Quả"
+  }
+]

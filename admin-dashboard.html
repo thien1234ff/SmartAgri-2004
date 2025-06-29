@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+</head>
+<body>
+  <h1>ADMIN DASHBOARD</h1>
+  <p id="admin-content"></p>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA6WyGsOeOlct2BcOeQSZ6ogo2aGUa_MyQ",
+      authDomain: "nongnghiepxanh-f6689.firebaseapp.com",
+      projectId: "nongnghiepxanh-f6689",
+      storageBucket: "nongnghiepxanh-f6689.firebasestorage.app",
+      messagingSenderId: "846834085038",
+      appId: "1:846834085038:web:cfac519e025896626d113f",
+      measurementId: "G-619BFYRKGT"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          const role = userDoc.data().role;
+          console.log("Role của user:", role);
+
+          if (role !== "admin") {
+            alert("Bạn không có quyền truy cập trang admin.");
+            window.location.href = "index.html";
+          } else {
+            document.getElementById("admin-content").textContent =
+              "Xin chào ADMIN: " + user.email;
+          }
+        } else {
+          console.log("Không tìm thấy dữ liệu user.");
+          window.location.href = "index.html";
+        }
+      } else {
+        window.location.href = "login.html";
+      }
+    });
+  </script>
+</body>
+</html>

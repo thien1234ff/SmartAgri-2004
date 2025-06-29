@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản Lý Vai Trò & Quyền - Smart Agriculture</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script crossOrigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossOrigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script crossOrigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    // Dữ liệu mẫu (sẽ được thay bằng API Firebase)
+    const initialRoles = [
+      { id: 1, name: 'farmer', permissions: ['view'] },
+      { id: 2, name: 'manager', permissions: ['view', 'edit'] },
+      { id: 3, name: 'admin', permissions: ['view', 'edit', 'delete'] },
+    ];
+
+    // Component Role Management
+    const RoleManagement = () => {
+      const [roles, setRoles] = React.useState(initialRoles);
+      const [newRole, setNewRole] = React.useState({ name: '', permissions: [] });
+      const [selectedRole, setSelectedRole] = React.useState(null);
+
+      const handleAddRole = (e) => {
+        e.preventDefault();
+        if (newRole.name && newRole.permissions.length > 0) {
+          const newRoleId = roles.length + 1;
+          setRoles([...roles, { id: newRoleId, ...newRole }]);
+          setNewRole({ name: '', permissions: [] });
+        }
+      };
+
+      const handleSelectRole = (role) => {
+        setSelectedRole(role);
+      };
+
+      const handleUpdatePermissions = (e) => {
+        if (selectedRole) {
+          const updatedRoles = roles.map(r =>
+            r.id === selectedRole.id ? { ...r, permissions: e.target.value.split(',') } : r
+          );
+          setRoles(updatedRoles);
+          setSelectedRole({ ...selectedRole, permissions: e.target.value.split(',') });
+        }
+      };
+
+      return (
+        <div className="container mx-auto p-6">
+          <h1 className="text-2xl font-bold text-green-700 mb-4">Quản Lý Vai Trò & Quyền</h1>
+
+          {/* Form thêm vai trò */}
+          <form onSubmit={handleAddRole} className="bg-white p-4 rounded-lg shadow mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input
+                type="text"
+                value={newRole.name}
+                onChange={(e) => setNewRole({ ...newRole, name: e.target.value })}
+                placeholder="Tên vai trò (nông dân, quản lý, admin)"
+                className="border p-2 rounded"
+                required
+              />
+              <input
+                type="text"
+                value={newRole.permissions.join(',')}
+                onChange={(e) => setNewRole({ ...newRole, permissions: e.target.value.split(',') })}
+                placeholder="Quyền (view, edit, delete, cách nhau bằng dấu phẩy)"
+                className="border p-2 rounded"
+                required
+              />
+            </div>
+            <button type="submit" className="mt-4 bg-green-500 text-white p-2 rounded hover:bg-green-600">
+              Thêm Vai Trò
+            </button>
+          </form>
+
+          {/* Danh sách vai trò */}
+          <div className="bg-white p-4 rounded-lg shadow">
+            <h2 className="text-xl font-semibold mb-2">Danh Sách Vai Trò</h2>
+            <ul className="space-y-2">
+              {roles.map((role) => (
+                <li
+                  key={role.id}
+                  className="flex justify-between items-center p-2 border rounded cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSelectRole(role)}
+                >
+                  <span>{role.name}</span>
+                  <span>{role.permissions.join(', ')}</span>
+                </li>
+              ))}
+            </ul>
+
+            {/* Cập nhật quyền */}
+            {selectedRole && (
+              <div className="mt-4">
+                <h3 className="text-lg font-medium">Cập nhật quyền cho {selectedRole.name}</h3>
+                <input
+                  type="text"
+                  value={selectedRole.permissions.join(',')}
+                  onChange={handleUpdatePermissions}
+                  placeholder="Quyền (view, edit, delete, cách nhau bằng dấu phẩy)"
+                  className="border p-2 rounded w-full mt-2"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    // Render component
+    ReactDOM.render(<RoleManagement />, document.getElementById('root'));
+  </script>
+
+  <!-- Firebase CDN -->
+  <script type="module">
+    // Import Firebase modules
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    // Cấu hình Firebase (sử dụng cấu hình của bạn)
+    const firebaseConfig = {
+      apiKey: "AIzaSyA6WyGsOeOlct2BcOeQSZ6ogo2aGUa_MyQ",
+      authDomain: "nongnghiepxanh-f6689.firebaseapp.com",
+      projectId: "nongnghiepxanh-f6689",
+      storageBucket: "nongnghiepxanh-f6689.firebasestorage.app",
+      messagingSenderId: "846834085038",
+      appId: "1:846834085038:web:cfac519e025896626d113f",
+      measurementId: "G-619BFYRKGT",
+      databaseURL: "https://nongnghiepxanh-f6689-default-rtdb.asia-southeast1.firebasedatabase.app" // Thay bằng URL thực của Realtime Database
+    };
+
+    // Khởi tạo Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const database = getDatabase(app);
+
+    // Kiểm tra quyền truy cập (tạm thời chỉ kiểm tra trạng thái đăng nhập)
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = 'index.html';
+      }
+    });
+
+    // API để lưu vai trò (tạm thời dùng Realtime Database)
+    window.saveRole = (role) => {
+      const user = auth.currentUser;
+      if (user) {
+        const roleRef = ref(database, `roles/${role.id}`);
+        set(roleRef, role).then(() => {
+          console.log('Vai trò đã được lưu:', role);
+        }).catch((error) => {
+          console.error('Lỗi khi lưu vai trò:', error.message);
+        });
+      }
+    };
+
+    // API để lấy danh sách vai trò
+    window.getRoles = () => {
+      const rolesRef = ref(database, 'roles');
+      return get(rolesRef).then((snapshot) => {
+        if (snapshot.exists()) {
+          return Object.values(snapshot.val());
+        }
+        return [];
+      }).catch((error) => {
+        console.error('Lỗi khi lấy vai trò:', error.message);
+        return [];
+      });
+    };
+  </script>
+</body>
+</html>
