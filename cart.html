@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Giỏ Hàng</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f7f7f7;
+      padding: 20px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    header h1 {
+      color: #4CAF50;
+      font-size: 24px;
+    }
+    .back-btn {
+      text-decoration: none;
+      background: #4CAF50;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 4px;
+    }
+    #cart-items {
+      list-style-type: none;
+      padding: 0;
+    }
+    .cart-item {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 12px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+    }
+    .cart-item img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      margin-right: 10px;
+    }
+    .cart-item .details {
+      flex-grow: 1;
+    }
+    .cart-item input[type="checkbox"] {
+      margin-right: 10px;
+    }
+    .cart-item input[type="number"] {
+      width: 50px;
+      margin: 0 10px;
+    }
+    .cart-item button {
+      background: #e53935;
+      color: #fff;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #total-section {
+      margin-top: 20px;
+      display: none;
+    }
+    #payment-options, #order-button {
+      display: none;
+    }
+    #order-button button {
+      background: #4CAF50;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+    .stock-warning {
+      color: #e53935;
+      font-size: 12px;
+      margin-left: 10px;
+    }
+    #select-all {
+      background: #4CAF50;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Giỏ Hàng</h1>
+    <a href="product1.html" class="back-btn">Quay lại</a>
+  </header>
+
+  <main>
+    <button id="select-all">Chọn tất cả</button>
+    <ul id="cart-items"></ul>
+    <div id="total-section">
+      <h3>Tổng tiền: <span id="cart-total">0 VNĐ</span></h3>
+      <div id="order-button">
+        <button onclick="placeOrder()">Đặt hàng</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    let productsData = [];
+    let customerInfo = JSON.parse(localStorage.getItem('customerInfo')) || { name: '', address: '', phone: '' };
+
+    // Lấy dữ liệu tồn kho từ database.json
+    fetch("database.json")
+      .then(response => response.json())
+      .then(data => {
+        productsData = data;
+        saveCart();
+      })
+      .catch(err => console.error("Lỗi load database.json:", err));
+
+    function saveCart() {
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCart();
+    }
+
+    function updateCart() {
+      const cartItems = document.getElementById('cart-items');
+      cartItems.innerHTML = '';
+      cart.forEach((item, index) => {
+        const product = productsData.find(p => p.name === item.name);
+        const stock = product ? product.stock : 0;
+        const totalQuantity = cart.filter(i => i.name === item.name).reduce((sum, i) => sum + i.quantity, 0);
+
+        const li = document.createElement('li');
+        li.className = 'cart-item';
+        li.innerHTML = `
+          <input type="checkbox" data-index="${index}" onchange="calculateTotal()">
+          <img src="${item.image}" alt="${item.name}">
+          <div class="details">
+            <h3>${item.name}</h3>
+            <p>Giá: ${item.price.toLocaleString()} VNĐ x </p>
+            <input type="number" value="${item.quantity}" min="1" onchange="updateQuantity(${index}, this.value, ${stock})">
+            <span class="stock-warning" id="stock-warning-${index}"></span>
+          </div>
+          <button onclick="removeItem(${index})">Xóa</button>
+        `;
+        cartItems.appendChild(li);
+      });
+      calculateTotal();
+    }
+
+    function updateQuantity(index, newQuantity, stock) {
+      newQuantity = parseInt(newQuantity);
+      if (isNaN(newQuantity) || newQuantity < 1) newQuantity = 1;
+
+      const currentItem = cart[index];
+      const totalQuantityInCart = cart.filter(item => item.name === currentItem.name).reduce((sum, item) => sum + item.quantity, 0);
+      const currentQuantity = currentItem.quantity;
+      const newTotalQuantity = totalQuantityInCart - currentQuantity + newQuantity;
+
+      const warning = document.getElementById(`stock-warning-${index}`);
+
+      if (newTotalQuantity > stock) {
+        const availableQuantity = stock - (totalQuantityInCart - currentQuantity);
+        if (availableQuantity < 1) {
+          newQuantity = 1; // Giới hạn tối thiểu
+          warning.textContent = `Số lượng vượt quá tồn kho (${stock}). Đã giới hạn về 1!`;
+        } else {
+          newQuantity = availableQuantity;
+          warning.textContent = `Số lượng vượt quá tồn kho (${stock}). Đã giới hạn về ${newQuantity}!`;
+        }
+        alert(`Số lượng vượt quá tồn kho (${stock}). Đã điều chỉnh về ${newQuantity}.`);
+      } else {
+        warning.textContent = '';
+      }
+
+      cart[index].quantity = newQuantity;
+      saveCart();
+    }
+
+    function removeItem(index) {
+      cart.splice(index, 1);
+      saveCart();
+    }
+
+    function calculateTotal() {
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      let total = 0;
+      checkboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+          const index = checkbox.getAttribute('data-index');
+          total += cart[index].price * cart[index].quantity;
+        }
+      });
+      const totalSection = document.getElementById('total-section');
+      const cartTotal = document.getElementById('cart-total');
+      if (total > 0) {
+        cartTotal.textContent = total.toLocaleString() + ' VNĐ';
+        totalSection.style.display = 'block';
+        document.getElementById('order-button').style.display = 'block';
+      } else {
+        totalSection.style.display = 'none';
+        document.getElementById('order-button').style.display = 'none';
+      }
+    }
+
+    function placeOrder() {
+      const selectedItems = [];
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      checkboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+          const index = checkbox.getAttribute('data-index');
+          selectedItems.push(cart[index]);
+        }
+      });
+      if (selectedItems.length > 0) {
+        localStorage.setItem('selectedItems', JSON.stringify(selectedItems));
+        window.location.href = 'order.html';
+      } else {
+        alert('Vui lòng chọn ít nhất một sản phẩm để đặt hàng!');
+      }
+    }
+
+    // Thêm sự kiện cho nút Chọn tất cả
+    document.getElementById('select-all').addEventListener('click', () => {
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = !allChecked;
+      });
+      calculateTotal();
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (productsData.length === 0) {
+        fetch("database.json")
+          .then(response => response.json())
+          .then(data => {
+            productsData = data;
+            saveCart();
+          })
+          .catch(err => console.error("Lỗi load database.json:", err));
+      } else {
+        saveCart();
+      }
+    });
+  </script>
+</body>
+</html>
